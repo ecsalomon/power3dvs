@@ -112,9 +112,29 @@ final$youred <- factor(final$youred,
                                   "Professional / Post-graduate degree"))
 ```
 
+## Create condition variables for analyses
 
+Conidition was recorded with a dummy code (0 = Low Power; 1 = High Power). We will convert these to effect codes with a 1 unit difference, weighted by the number of participants randomly assigned to the other condition. Weighted effect codes will produce regression coefficients that represent the mean difference between the groups. 
 
+```{r}
+# how many participants were assigned to each condition?
+lowN <- nrow(final[final$Cond == 0,])
+highN <- nrow(final[final$Cond == 1,])
 
+# create weights
+final$effect[final$Cond == 0] <- -highN / finalCases
+final$effect[final$Cond == 1] <- lowN / finalCases
+```
+
+There were `r lowN` and `r highN` participants in the Low and High Power conditions, respectively.
+
+We will also turn the original dummy code into a factor, which will be useful for plotting and tables.
+
+```{r}
+final$Cond <- factor(final$Cond,
+                     levels = c(0,1),
+                     labels = c("Low Power", "High Power"))
+```
 
 
 
