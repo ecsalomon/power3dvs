@@ -7,18 +7,7 @@ output:
     fig_caption: yes
 ---
 
-```{r setup, include=FALSE}
-# Load Packages
-library(scrapeR)
-library(XML)
-library(psych)
-library(ggplot2)
-library(GGally)
-library(plyr)
-library(rjson)
-library(reshape)
-library(knitr)
-```
+
 
 ## Summary
 
@@ -36,7 +25,8 @@ Participants completed measures for each of the dependent variables in a random 
 
 The data were collected using Qualtrics. The first row of the raw data file contains most of the variable names. The second row contains some further variable names and the question wording. Rows three and beyond contain participant data. So we will first load in the two sets of variable names and combine them. Then, we will load in the data.
 
-```{r, cache=FALSE}
+
+```r
 filename <- "PR__Priming_Power__3_DVs__Action_PerspectiveTaking_Distrust.csv"
 
 name1 <- names(read.csv(filename, nrow = 1))
@@ -55,7 +45,8 @@ The final data set should only contain cases that represent:
 
 We will identify and count cases that do not meet these criteria. 
 
-```{r}
+
+```r
 # how many cases total?
 totalCases <- nrow(raw)
 
@@ -73,13 +64,14 @@ final <- raw[with(raw, IMC == 10 & Country == "United States"),]
 finalCases <- nrow(final)
 ```
 
-From `r totalCases` raw cases, `r nonUScount` had non-US IP addresses and `r failedIMCcount` failed the IMC (`r bothExcludeCount` failed the IMC *and* had a non-US IP), leaving `r finalCases` for analysis.
+From 626 raw cases, 19 had non-US IP addresses and 29 failed the IMC (1 failed the IMC *and* had a non-US IP), leaving 579 for analysis.
 
 ## Create labels for categorical/ordinal demographic variables
 
 The categorical and ordinal demographic variables (e.g., race, gender) are coded with numbers. We want to add category labels to these. 
 
-```{r}
+
+```r
 # ethnicity/race
 final$ethnic2 <- factor(final$ethnic2,
                         levels = c(1,2,3,4,5,6),
@@ -120,7 +112,8 @@ final$youred <- factor(final$youred,
 
 Conidition was recorded with a dummy code (0 = Low Power; 1 = High Power). We will convert these to effect codes with a 1 unit difference, weighted by the number of participants randomly assigned to the other condition. Weighted effect codes will produce regression coefficients that represent the mean difference between the groups. 
 
-```{r}
+
+```r
 # how many participants were assigned to each condition?
 lowN <- nrow(final[final$Cond == 0,])
 highN <- nrow(final[final$Cond == 1,])
@@ -130,11 +123,12 @@ final$effect[final$Cond == 0] <- -highN / finalCases
 final$effect[final$Cond == 1] <- lowN / finalCases
 ```
 
-There were `r lowN` and `r highN` participants in the Low and High Power conditions, respectively.
+There were 299 and 280 participants in the Low and High Power conditions, respectively.
 
 We will also turn the original dummy code into a factor, which will be useful for plotting and tables.
 
-```{r}
+
+```r
 final$Cond <- factor(final$Cond,
                      levels = c(0,1),
                      labels = c("Low Power", "High Power"))
@@ -149,21 +143,69 @@ Before we run our preferred model, we should use exploratory data analysis to ex
 
 First, we will look at the demographic composition of our sample.
  
-```{r}
+
+```r
 # Gender
 table(final[,"gender"])
+```
 
+```
+## 
+##   Male Female 
+##    222    357
+```
+
+```r
 # Age
 describe(final[,"age"])
+```
 
+```
+##   vars   n  mean    sd median trimmed mad min max range skew kurtosis   se
+## 1    1 579 32.06 13.17     29   30.26 8.9  18 227   209 6.24    81.73 0.55
+```
+
+```r
 # Race/ethnicity
 prop.table(table(final$ethnic2))
+```
 
+```
+## 
+##  African American    Asian American European American     Latino/Latina 
+##        0.07599309        0.05872193        0.68221071        0.05872193 
+##   Native American             Other 
+##        0.01208981        0.11226252
+```
+
+```r
 # Income
 prop.table(table(final[,"yyour"]))
+```
 
+```
+## 
+##       Under $15,000   $15,001 - $25,000   $25,000 - $35,000 
+##          0.20934256          0.15224913          0.14532872 
+##   $35,001 - $50,000   $50,001 - $75,000  $75,001 - $100,000 
+##          0.16782007          0.19377163          0.06747405 
+## $100,001 - $150,000       Over $150,000 
+##          0.05190311          0.01211073
+```
+
+```r
 # Education
 prop.table(table(final$youred))
+```
+
+```
+## 
+##                Less than high school High school graduation or equivalent 
+##                           0.01036269                           0.09844560 
+##                         Some college                   College graduation 
+##                           0.35233161                           0.42314335 
+##  Professional / Post-graduate degree 
+##                           0.11571675
 ```
 
 Overall, the sample looks similar to other Mechanical Turk samples.
@@ -178,7 +220,8 @@ First, we should examine the individual items. Are there issues with how the dat
 
 Before we look at the items, we will need to score the items of the Reading the Mind in the Eyes (RME) test.
 
-```{r}
+
+```r
 # the correct answers
 answers <- c(1, 2, 3, 2, 3, 2, 3, 1, 4, 1)
 answers <- answers + 18 # responses were recorded as 19 through 22
@@ -195,7 +238,8 @@ for (i in 1:10) {
 
 Now we can look at the items.
 
-```{r}
+
+```r
 # Which columns represent items?
 actionCols <- c(44:50) # action goals
 wvsCols <- c(51:56) # World Values Survey trust
@@ -218,77 +262,23 @@ rmeDVs <- melt(final, id = "ResponseID",
 ```
 
 We'll look at plots for each set of variables.
-\
-\
-```{r, echo=FALSE, dpi=300, fig.height = 3, message = FALSE, warning = FALSE}
-actionBarPlot <- ggplot(actionDVs, aes(x = factor(value))) + 
-  geom_bar() +
-  facet_wrap(~ variable) +
-  xlab("score") +
-  ggtitle("Distributions of Raw Responses to Action/Inaction Goal Items")
-actionBarPlot
-```
-\
-\
+
+![Distributions of Raw Responses to Action/Inaction Goal Items](figure/unnamed-chunk-9-1.png) 
+
 The action/inaction items were recorded as 19 to 26, instead of 1 to 7.
-\
-\
-```{r, echo=FALSE, dpi=300, fig.height = 3, message = FALSE, warning = FALSE}
-wvsBarPlot <- ggplot(wvsDVs, aes(x = factor(value))) + 
-  geom_bar() +
-  facet_wrap(~ variable) +
-  xlab("score") + 
-  ggtitle("Distributions of Raw Responses to World Values Survey Trust Items")
-wvsBarPlot
-```
-\
-\
-One of the World Values Survey trust items has a severely skewed distribution. This is unsurprising as it indicates that most people trust their families completely.
-\
-\
-```{r, echo=FALSE, dpi=300, fig.height = 3, message = FALSE, warning = FALSE}
-gameHist <- ggplot(final, aes(x = TrustGame_1)) + 
-  geom_histogram() +
-  xlab("tickets given") + 
-  ggtitle("Historgram of Number of Tickets Given Away in Trust Game")
-gameHist
-```
-\
-\
+
+![Distributions of Raw Responses to World Values Survey Trust Items](figure/unnamed-chunk-10-1.png) 
+
+One of the World Values Survey trust items has a severely skewed distribution. This is unsurprising as it indicates that most people trust their family completely.
+
+![Historgram of Number of Tickets Given Away in Trust Game](figure/unnamed-chunk-11-1.png) 
+
 There is a good spread of responses across the Trust Game, with an obvious mode around 500.
-\
-\
-```{r, echo=FALSE, dpi=300, fig.height = 3, message = FALSE, warning = FALSE}
-iriBarPlot <- ggplot(iriDVs, aes(x = factor(value))) + 
-  geom_bar() +
-  facet_wrap(~ variable) +
-  xlab("score") +
-  ggtitle("Distributions of Raw Responses to IRI Items")
-iriBarPlot
-```
-\
-\
+
+![Distributions of Raw Responses to IRI Items](figure/unnamed-chunk-12-1.png) 
+
 Like the action/inaction items, the IRI items were recorded beginning at 19 instead of 1.
-\
-\
-```{r, echo=FALSE, dpi=300, fig.height = 3, message = FALSE, warning = FALSE}
-rmeBarPlot <- ggplot(rmeDVs, aes(x = factor(value))) + 
-  geom_bar() +
-  facet_wrap(~ variable) +
-  xlab("score") +
-  scale_y_continuous(breaks = c(0, 125, 250, 375, 500)) +
-  ggtitle("Distributions of Raw Responses to IRI Items")
-rmeBarPlot
-```
-\
-\
+
+![Distributions of Raw Responses to IRI Items](figure/unnamed-chunk-13-1.png) 
+
 Overall, people were fairly accurate on the Reading the Mind in Eyes items, though some of items show substantial proportions of people who answered incorrectly.
-
-We will recode the items from the action/inaction goals scale and the IRI perspective-taking scale so that they are scored as 1 to 7 and 1 to 5, respectively.
-
-```{r recode}
-# for each item, subtrach 18 from the score
-for(i in c(actionCols, iriCols)){ 
-  final[, i] <- final[, i] - 18
-}
-```
