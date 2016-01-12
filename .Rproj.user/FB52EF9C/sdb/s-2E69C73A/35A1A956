@@ -1,0 +1,17 @@
+{
+    "contents" : "---\ntitle: 'Data Analysis for: Priming Power with 3 DVs'\nauthor: \"Erika Salomon\"\ndate: \"January 12, 2016\"\noutput: pdf_document\n---\n\n```{r, include=FALSE}\n## Load Packages\nlibrary(scrapeR)\nlibrary(XML)\nlibrary(psych)\nlibrary(ggplot2)\nlibrary(GGally)\nlibrary(plyr)\nlibrary(rjson)\n```\n\n## Summary\n\nThis file reports data manipulations and analyses performed on an experiment studying the effects of power primes. Participants completed a power priming manipulation in which they were asked recall and visualize a time when they were high or low in power. After writing a description of their visualization, they completed a series of tasks to assess three dependent variables. They completed this . \n\n## Load the raw data and combine data sets\n\nThe data were collected from three different online surveys implemented in Qualtrics. First, the files must be loaded and combined into a single raw data matrix.\n\nThe first row of each file contains most of the variable names. The second row contains some further variable names and the question wording. Rows three and beyond contain participant data. So, for each file, we will first load in the two sets of variable names and combine them. Then, we will load in the data.\n\n```{r, cache=FALSE}\n# File 1\nname1.1 <- names(read.csv(\"IH__Cognitive_Load__IntrinsicExtrinsic_Between_Subjects.csv\",\n                          nrow = 1))\nname1.2 <- names(read.csv(\"IH__Cognitive_Load__IntrinsicExtrinsic_Between_Subjects.csv\",\n                          nrow = 1, skip = 1))\nnames1 <- c(name1.2[1:13], name1.1[14:(length(name1.1))])\nraw1 <- read.csv(\"IH__Cognitive_Load__IntrinsicExtrinsic_Between_Subjects.csv\",\n                 header = FALSE, skip = 2, col.names = names1, \n                 stringsAsFactors = FALSE)\n\n# File 2\nname2.1 <- names(read.csv(\"IH_Demo_Study_7__Cog_Load__V_5_Rate_Intr_Only.csv\",\n                          nrow = 1))\nname2.2 <- names(read.csv(\"IH_Demo_Study_7__Cog_Load__V_5_Rate_Intr_Only.csv\",\n                          nrow = 1, skip = 1))\nnames2 <- c(name2.2[1:13], name2.1[14:(length(name2.1))])\nraw2 <- read.csv(\"IH_Demo_Study_7__Cog_Load__V_5_Rate_Intr_Only.csv\",\n                 header = FALSE, skip = 2, col.names = names2, \n                 stringsAsFactors = FALSE)\n\n# File 3\nname3.1 <- names(read.csv(\"IH_Demo_Study_8__Cog_Load__V_6_Rate_Extr_Only.csv\",\n                          nrow = 1))\nname3.2 <- names(read.csv(\"IH_Demo_Study_8__Cog_Load__V_6_Rate_Extr_Only.csv\",\n                          nrow = 1, skip = 1))\nnames3 <- c(name3.2[1:13], name3.1[14:(length(name3.1))])\nraw3 <- read.csv(\"IH_Demo_Study_8__Cog_Load__V_6_Rate_Extr_Only.csv\",\n                 header = FALSE, skip = 2, col.names = names3, \n                 stringsAsFactors = FALSE)\n```\n",
+    "created" : 1452614929618.000,
+    "dirty" : true,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3766623640",
+    "id" : "35A1A956",
+    "lastKnownWriteTime" : 1452615390,
+    "path" : "~/Box Sync/Research/PR_Priming/power3dvs/power3dvs.Rmd",
+    "project_path" : "power3dvs.Rmd",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "source_on_save" : false,
+    "type" : "r_markdown"
+}

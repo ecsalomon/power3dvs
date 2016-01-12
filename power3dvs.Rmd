@@ -1,0 +1,59 @@
+---
+title: 'Data Analysis for: Priming Power with 3 DVs'
+author: "Erika Salomon"
+date: "January 12, 2016"
+output: pdf_document
+---
+
+```{r, include=FALSE}
+## Load Packages
+library(scrapeR)
+library(XML)
+library(psych)
+library(ggplot2)
+library(GGally)
+library(plyr)
+library(rjson)
+```
+
+## Summary
+
+This file reports data manipulations and analyses performed on an experiment studying the effects of power primes. Participants completed a power priming manipulation in which they were asked recall and visualize a time when they were high or low in power. After writing a description of their visualization, they completed a series of tasks to assess three dependent variables. . 
+
+## Load the raw data and combine data sets
+
+The data were collected from three different online surveys implemented in Qualtrics. First, the files must be loaded and combined into a single raw data matrix.
+
+The first row of each file contains most of the variable names. The second row contains some further variable names and the question wording. Rows three and beyond contain participant data. So, for each file, we will first load in the two sets of variable names and combine them. Then, we will load in the data.
+
+```{r, cache=FALSE}
+# File 1
+name1.1 <- names(read.csv("IH__Cognitive_Load__IntrinsicExtrinsic_Between_Subjects.csv",
+                          nrow = 1))
+name1.2 <- names(read.csv("IH__Cognitive_Load__IntrinsicExtrinsic_Between_Subjects.csv",
+                          nrow = 1, skip = 1))
+names1 <- c(name1.2[1:13], name1.1[14:(length(name1.1))])
+raw1 <- read.csv("IH__Cognitive_Load__IntrinsicExtrinsic_Between_Subjects.csv",
+                 header = FALSE, skip = 2, col.names = names1, 
+                 stringsAsFactors = FALSE)
+
+# File 2
+name2.1 <- names(read.csv("IH_Demo_Study_7__Cog_Load__V_5_Rate_Intr_Only.csv",
+                          nrow = 1))
+name2.2 <- names(read.csv("IH_Demo_Study_7__Cog_Load__V_5_Rate_Intr_Only.csv",
+                          nrow = 1, skip = 1))
+names2 <- c(name2.2[1:13], name2.1[14:(length(name2.1))])
+raw2 <- read.csv("IH_Demo_Study_7__Cog_Load__V_5_Rate_Intr_Only.csv",
+                 header = FALSE, skip = 2, col.names = names2, 
+                 stringsAsFactors = FALSE)
+
+# File 3
+name3.1 <- names(read.csv("IH_Demo_Study_8__Cog_Load__V_6_Rate_Extr_Only.csv",
+                          nrow = 1))
+name3.2 <- names(read.csv("IH_Demo_Study_8__Cog_Load__V_6_Rate_Extr_Only.csv",
+                          nrow = 1, skip = 1))
+names3 <- c(name3.2[1:13], name3.1[14:(length(name3.1))])
+raw3 <- read.csv("IH_Demo_Study_8__Cog_Load__V_6_Rate_Extr_Only.csv",
+                 header = FALSE, skip = 2, col.names = names3, 
+                 stringsAsFactors = FALSE)
+```
