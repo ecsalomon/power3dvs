@@ -9,15 +9,11 @@ output:
 
 ```{r setup, include=FALSE}
 # Load Packages
-library(scrapeR)
-library(XML)
 library(psych)
 library(ggplot2)
 library(GGally)
 library(plyr)
-library(rjson)
 library(reshape)
-library(knitr)
 ```
 
 ## Summary
@@ -66,7 +62,7 @@ nonUScount <- nrow(raw[with(raw, Country != "United States"),])
 failedIMCcount <- nrow(raw[with(raw, IMC != 10),])
 
 # identify participants who meet both exclusion criteria
-bothExcludeCount <- nrow(raw[with(raw, IMC != 10 & Country != "United States"),])
+bothExcludeCount <- nrow(raw[with(raw,IMC != 10 & Country != "United States"),])
 
 # create final data set and count cases
 final <- raw[with(raw, IMC == 10 & Country == "United States"),]
@@ -287,8 +283,82 @@ Overall, people were fairly accurate on the Reading the Mind in Eyes items, thou
 We will recode the items from the action/inaction goals scale and the IRI perspective-taking scale so that they are scored as 1 to 7 and 1 to 5, respectively.
 
 ```{r recode}
-# for each item, subtrach 18 from the score
-for(i in c(actionCols, iriCols)){ 
-  final[, i] <- final[, i] - 18
-}
+# for each item, subtract 18 from the score
+final[, c(actionCols, iriCols)] = final[, c(actionCols, iriCols)] - 18
 ```
+
+### Compute Scale Scores & Cronbach's alphas
+
+Next, we will combine the items into scales and examine their intercorrelations. Some of the items need to be reverse scored before being combined with other items.
+
+```{r reverse score}
+# reverse score inaction goal items from action/inaction goals scale
+final[, c("AI03nap", "AI05rest", "AI07relax")] <- 8 - final[, c("AI03nap", "AI05rest", "AI07relax")]
+
+# reverse score non-prespective-taking items from IRI
+final[, c("IRI01", "IRI04")] <- 6 - final[, c("IRI01", "IRI04")]
+
+# reverse score items on the WVS trust measure so that 4 indicates high trust
+final[, wvsCols] <- 5 - final[, wvsCols]
+```
+
+```{r cronbach}
+# create lists of key values identifying which items will be included in which
+# scales
+key.list <- list(action = c(1:7), 
+                 wvs    = c(8:13), 
+                 game   = c(14),
+                 iri    = c(15:21),
+                 rme    = c(22:31))
+
+# link items names to key values
+keys <- make.keys(31, key.list, item.labels=c(colnames(final)[dvCols]))
+
+# create scores
+scores <- scoreItems(keys,
+                     final[, dvCols],
+                     totals = FALSE,
+                     missing = TRUE,
+                     impute = "median")
+
+# add the scores to the data set
+final <- cbind(final, scores$scores)
+
+### Create standardized scale scores
+stdScores <- scale(scores$scores)
+colnames(stdScores) <- paste(colnames(stdScores), ".z", sep = "")
+final <- cbind(final, stdScores)
+
+print(scores, short = FALSE)
+```
+
+It looks like the two trust measures are weakly positively correlated, and the two perspective-taking measures are uncorrelated. For this reason, we will analyze these scales separately.
+
+### Examine demographics by condition
+
+Let's take a look at the demographic characteristics of each condition separately.
+
+```{r condition demo}
+ddply(final, .(Cond), summarize,
+      men = length(ResponseID[gender == "Male"]) / length(ResponseID),
+      women = length(ResponseID[gender == "Female"]) / length(ResponseID),
+      mean.age = mean(age), 
+      perc.white = length(ResponseID[ethnic2 == "European American"]) / length(ResponseID))
+```
+
+
+### Examine order effects
+
+Let's take a look at the demographic characteristics of each condition separately.
+
+```{r condition demo}
+ddply(final, .(Cond), summarize,
+      men = length(ResponseID[gender == "Male"]) / length(ResponseID),
+      women = length(ResponseID[gender == "Female"]) / length(ResponseID),
+      mean.age = mean(age), 
+      perc.white = length(ResponseID[ethnic2 == "European American"]) / length(ResponseID))
+```
+
+## Confirmatory analyses
+
+Now, let's look a
