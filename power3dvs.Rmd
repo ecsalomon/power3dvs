@@ -137,7 +137,29 @@ final$Cond <- factor(final$Cond,
 ```
 
 
+## Exploratory data analysis
 
+Before we run our preferred model, we should use exploratory data analysis to examine the distributions of variables and investigate the potential influence of order effects on the dependent variables.
 
+### Descriptive summaries of demographic variables
 
+First, we will look at the demographic composition of our sample.
+ 
+```{r}
+# Gender
+table(final[,"gender"])
 
+# Age
+describe(final[,"age"])
+
+# Race/ethnicity
+prop.table(table(final$ethnic2))
+
+# Income
+prop.table(table(final[,"yyour"]))
+
+# Education
+prop.table(table(final$youred))
+```
+
+Overall, the sample looks similar to other Mechanical Turk samples.
