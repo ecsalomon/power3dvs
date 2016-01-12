@@ -71,41 +71,52 @@ finalCases <- nrow(final)
 
 From `r totalCases` raw cases, `r nonUScount` had non-US IP addresses and `r failedIMCcount` failed the IMC (`r bothExcludeCount` failed the IMC *and* had a non-US IP), leaving `r finalCases` for analysis.
 
-### Create labels for categorical demographic variables
+## Create labels for categorical/ordinal demographic variables
+
+The categorical and ordinal demographic variables (e.g., race, gender) are coded with numbers. We want to add category labels to these. 
+
+```{r}
 # ethnicity/race
-included$ethnic2 <- factor(included$ethnic2,
-                           levels = c(1,2,3,4,5,6),
-                           labels = c("African American",
-                                      "Asian American",
-                                      "European American",
-                                      "Latino/Latina",
-                                      "Native American",
-                                      "Other"))
+final$ethnic2 <- factor(final$ethnic2,
+                        levels = c(1,2,3,4,5,6),
+                        labels = c("African American",
+                                   "Asian American",
+                                   "European American",
+                                   "Latino/Latina",
+                                   "Native American",
+                                   "Other"))
 
 # gender
-included$gender <- factor(included$gender,
-                          levels = c(1,2),
-                          labels = c("Male", "Female"))
+final$gender <- factor(final$gender,
+                       levels = c(1,2),
+                       labels = c("Male", "Female"))
 
 # income 
-included[,"income"] <- factor(included[,"income"],
-                              levels = c(1,2,3,4,5,6,7,8),
-                              labels = c("Under $15,000",
-                                         "$15,001 - $25,000",
-                                         "$25,000 - $35,000",
-                                         "$35,001 - $50,000",
-                                         "$50,001 - $75,000",
-                                         "$75,001 - $100,000",
-                                         "$100,001 - $150,000",
-                                         "Over $150,000"))
+final$yyour <- factor(final$yyour,
+                      levels = c(1,2,3,4,5,6,7,8),
+                      labels = c("Under $15,000",
+                                 "$15,001 - $25,000",
+                                 "$25,000 - $35,000",
+                                 "$35,001 - $50,000",
+                                 "$50,001 - $75,000",
+                                 "$75,001 - $100,000",
+                                 "$100,001 - $150,000",
+                                 "Over $150,000"))
 
 # education 
-included[,"youred"] <- factor(included[,"youred"],
-                              levels = c(1,2,3,4,5),
-                              labels = c("Less than high school",
-                                         "High school graduation or equivalent",
-                                         "Some college", "College graduation",
-                                         "Professional / Post-graduate degree"))
+final$youred <- factor(final$youred,
+                       levels = c(1,2,3,4,5),
+                       labels = c("Less than high school",
+                                  "High school graduation or equivalent",
+                                  "Some college", "College graduation",
+                                  "Professional / Post-graduate degree"))
+```
+
+
+
+
+
+
 
 
 
