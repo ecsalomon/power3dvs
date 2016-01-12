@@ -41,3 +41,46 @@ names <- c(name2[1:22], name1[23:(length(name1))])
 raw <- read.csv(filename, header = FALSE, skip = 2, col.names = names,
                 stringsAsFactors = FALSE)
 ```
+
+## Reduce data set to a final, usable set of cases
+
+The final data set should only contain cases that represent:
+
++ US participants
++ Participants who passed the instructional manipulation check (IMC)
+
+We will identify and count cases that do not meet these criteria. 
+
+```{r}
+# how many cases total?
+totalCases <- nrow(raw)
+
+# identify surveys from outside the US
+nonUScount <- nrow(raw[with(raw, Country != "United States"),])
+
+# identify participants who failed the IMC
+failedIMCcount <- nrow(raw[with(raw, IMC != 10),])
+
+# identify participants who meet both exclusion criteria
+bothExcludeCount <- nrow(raw[with(raw, IMC != 10 & Country != "United States"),])
+
+# create final data set and count cases
+final <- raw[with(raw, IMC == 10 & Country == "United States"),]
+finalCases <- nrow(final)
+```
+
+From `r totalCases` raw cases, `r nonUScount` had non-US IP addresses and `r failedIMCcount` failed the IMC (`r bothExcludeCount` failed the IMC *and* had a non-US IP), leavinb `r finalCases` for analysis.
+
+### Final data set
+
+Finally, we will create a reduced data set that includes only valid cases that are not excluded for any of the reasons above. 
+
+```{r}
+final <- raw[with(raw, US == TRUE & IPDuplicate == FALSE & Status == 0
+                  & Finished == 1 & numNAs < 8),]
+```
+
+This final data set contains `r nrow(final)` cases.
+
+
+
