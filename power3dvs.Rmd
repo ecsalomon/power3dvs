@@ -18,7 +18,15 @@ library(rjson)
 
 ## Summary
 
-This file reports data manipulations and analyses performed on an experiment studying the effects of power primes. Participants completed a power priming manipulation in which they were asked recall and visualize a time when they were high or low in power. After writing a description of their visualization, they completed a series of tasks to assess three dependent variables. . 
+This file reports data manipulations and analyses performed on an experiment studying the effects of power primes. Participants recruited via Mechanical Turk completed a power priming manipulation in which they were asked recall and visualize a time when they were high or low in power. After writing a description of their visualization, they completed a series of tasks to assess three dependent variables.
+
+Participants'  **action/inaction intentions** were measured with 7 questions (e.g., "I am feeling energetic"; 1 = *not at all*, 7 = *extremely*; Albarracin, 2009, unpublished). 
+
+Participants' **trust** was measured with two measures. Six items from the World Values Survey asked how much participants trust people belonging to different groups (e.g., "People you meet for the first time"; 1 = *trust completely*, 4 = *do not trust at all*). Participants also completed the trust game (Berg et al., 1995), which asked them how many raffle tickets they would entrust to another person who may or may not return them.
+
+Two measures assessed participants' **perspective taking**. Participants answered seven items from the perspective-taking subscale of the Interpersonal Reactivity Index (Davis, 1980). These items were slightly modified to assess state rather than trait perspective taking motivation (e.g., "Before criticizing somebody, I'd try to imagine how I would feel if I were in their place"; 1 = *does not describe me at all*, 5 = *describes me very well*). Participants also completed 10 items from the Adult Reading the Mind in the Eyes Test-Revised (Baron-Cohen, Wheelwright, Hill, Raste & Plumb, 2001), which asked them to look at images of people's eyes and choose which of four emotions was expressed.
+
+Participants completed measures for each of the dependent variables in a random order. For trust and perspective-taking, the two measures were also randomly ordered.
 
 ## Load the raw data and combine data sets
 
