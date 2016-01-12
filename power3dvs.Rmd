@@ -69,18 +69,44 @@ final <- raw[with(raw, IMC == 10 & Country == "United States"),]
 finalCases <- nrow(final)
 ```
 
-From `r totalCases` raw cases, `r nonUScount` had non-US IP addresses and `r failedIMCcount` failed the IMC (`r bothExcludeCount` failed the IMC *and* had a non-US IP), leavinb `r finalCases` for analysis.
+From `r totalCases` raw cases, `r nonUScount` had non-US IP addresses and `r failedIMCcount` failed the IMC (`r bothExcludeCount` failed the IMC *and* had a non-US IP), leaving `r finalCases` for analysis.
 
-### Final data set
+### Create labels for categorical demographic variables
+# ethnicity/race
+included$ethnic2 <- factor(included$ethnic2,
+                           levels = c(1,2,3,4,5,6),
+                           labels = c("African American",
+                                      "Asian American",
+                                      "European American",
+                                      "Latino/Latina",
+                                      "Native American",
+                                      "Other"))
 
-Finally, we will create a reduced data set that includes only valid cases that are not excluded for any of the reasons above. 
+# gender
+included$gender <- factor(included$gender,
+                          levels = c(1,2),
+                          labels = c("Male", "Female"))
 
-```{r}
-final <- raw[with(raw, US == TRUE & IPDuplicate == FALSE & Status == 0
-                  & Finished == 1 & numNAs < 8),]
-```
+# income 
+included[,"income"] <- factor(included[,"income"],
+                              levels = c(1,2,3,4,5,6,7,8),
+                              labels = c("Under $15,000",
+                                         "$15,001 - $25,000",
+                                         "$25,000 - $35,000",
+                                         "$35,001 - $50,000",
+                                         "$50,001 - $75,000",
+                                         "$75,001 - $100,000",
+                                         "$100,001 - $150,000",
+                                         "Over $150,000"))
 
-This final data set contains `r nrow(final)` cases.
+# education 
+included[,"youred"] <- factor(included[,"youred"],
+                              levels = c(1,2,3,4,5),
+                              labels = c("Less than high school",
+                                         "High school graduation or equivalent",
+                                         "Some college", "College graduation",
+                                         "Professional / Post-graduate degree"))
+
 
 
 
