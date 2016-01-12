@@ -28,40 +28,16 @@ Two measures assessed participants' **perspective taking**. Participants answere
 
 Participants completed measures for each of the dependent variables in a random order. For trust and perspective-taking, the two measures were also randomly ordered.
 
-## Load the raw data and combine data sets
+## Load the raw data
 
-The data were collected from three different online surveys implemented in Qualtrics. First, the files must be loaded and combined into a single raw data matrix.
-
-The first row of each file contains most of the variable names. The second row contains some further variable names and the question wording. Rows three and beyond contain participant data. So, for each file, we will first load in the two sets of variable names and combine them. Then, we will load in the data.
+The data were collected using Qualtrics. The first row of the raw data file contains most of the variable names. The second row contains some further variable names and the question wording. Rows three and beyond contain participant data. So we will first load in the two sets of variable names and combine them. Then, we will load in the data.
 
 ```{r, cache=FALSE}
-# File 1
-name1.1 <- names(read.csv("IH__Cognitive_Load__IntrinsicExtrinsic_Between_Subjects.csv",
-                          nrow = 1))
-name1.2 <- names(read.csv("IH__Cognitive_Load__IntrinsicExtrinsic_Between_Subjects.csv",
-                          nrow = 1, skip = 1))
-names1 <- c(name1.2[1:13], name1.1[14:(length(name1.1))])
-raw1 <- read.csv("IH__Cognitive_Load__IntrinsicExtrinsic_Between_Subjects.csv",
-                 header = FALSE, skip = 2, col.names = names1, 
-                 stringsAsFactors = FALSE)
+filename <- "PR__Priming_Power__3_DVs__Action_PerspectiveTaking_Distrust.csv"
 
-# File 2
-name2.1 <- names(read.csv("IH_Demo_Study_7__Cog_Load__V_5_Rate_Intr_Only.csv",
-                          nrow = 1))
-name2.2 <- names(read.csv("IH_Demo_Study_7__Cog_Load__V_5_Rate_Intr_Only.csv",
-                          nrow = 1, skip = 1))
-names2 <- c(name2.2[1:13], name2.1[14:(length(name2.1))])
-raw2 <- read.csv("IH_Demo_Study_7__Cog_Load__V_5_Rate_Intr_Only.csv",
-                 header = FALSE, skip = 2, col.names = names2, 
-                 stringsAsFactors = FALSE)
-
-# File 3
-name3.1 <- names(read.csv("IH_Demo_Study_8__Cog_Load__V_6_Rate_Extr_Only.csv",
-                          nrow = 1))
-name3.2 <- names(read.csv("IH_Demo_Study_8__Cog_Load__V_6_Rate_Extr_Only.csv",
-                          nrow = 1, skip = 1))
-names3 <- c(name3.2[1:13], name3.1[14:(length(name3.1))])
-raw3 <- read.csv("IH_Demo_Study_8__Cog_Load__V_6_Rate_Extr_Only.csv",
-                 header = FALSE, skip = 2, col.names = names3, 
-                 stringsAsFactors = FALSE)
+name1 <- names(read.csv(filename, nrow = 1))
+name2 <- names(read.csv(filename, nrow = 1, skip = 1))
+names <- c(name2[1:22], name1[23:(length(name1))])
+raw <- read.csv(filename, header = FALSE, skip = 2, col.names = names,
+                stringsAsFactors = FALSE)
 ```
