@@ -349,16 +349,108 @@ ddply(final, .(Cond), summarize,
 
 ### Examine order effects
 
-Let's take a look at the demographic characteristics of each condition separately.
+It is possible that the order in which the dependent measures were presented affected the sizes of the effects. For example, if the manipulation wears off quickly, participants may show larger differences on measures immediately following the manipulation than on later measures.
 
-```{r condition demo}
-ddply(final, .(Cond), summarize,
-      men = length(ResponseID[gender == "Male"]) / length(ResponseID),
-      women = length(ResponseID[gender == "Female"]) / length(ResponseID),
-      mean.age = mean(age), 
-      perc.white = length(ResponseID[ethnic2 == "European American"]) / length(ResponseID))
+First we will need to convert the randomization variables to orders. We will focus on the order of presentation of action, trust, and perspective taking. 
+
+```{r extract order}
+extractOrder <- function(block, var) {
+  # given a block ID and a block order variable, return a vector containing
+  # the order of that block for participant
+  order <- rep(2, length(var))
+  order[grepl(paste("^", block, sep=""), var)] <- 1
+  order[grepl(paste(block, "$", sep=""), var)] <- 3
+
+  return(order)
+}
+
+# extract orders
+final$trust.order <- extractOrder("FL_89", final$DO.BR.FL_54)
+final$action.order <- extractOrder("FL_90", final$DO.BR.FL_54)
+final$perspective.order <- extractOrder("FL_91", final$DO.BR.FL_54)
 ```
+
+Now, we will graph the responses to the dependent variables by condition and order.
+\
+```{r, echo=FALSE, dpi=300, fig.height = 6, message = FALSE, warning = FALSE}
+dodge <- position_dodge(width = .9)
+
+ggplot(final, aes(x = Cond, y = action)) + 
+  geom_violin(position = dodge) +
+  scale_x_discrete("Condition") +
+  scale_y_continuous("Action Goals", limits = c(1, 7), breaks = c(1:7)) +
+  facet_wrap(~ action.order) +
+  ggtitle("Violin Plots of Action Goals Scores by Condition and Order of Task in Survey")
+```
+\
+Overall, it looks like there are similar differences by condition at each order, with possible attentuation when the scale is presented last.
+\
+```{r, echo=FALSE, dpi=300, fig.height = 6, message = FALSE, warning = FALSE}
+ggplot(final, aes(x = Cond, y = wvs)) + 
+  geom_violin(position = dodge) +
+  scale_x_discrete("Condition") +
+  scale_y_continuous("World Values Survey Trust", limits = c(1, 4), breaks = c(1:4)) +
+  facet_wrap(~ trust.order) +
+  ggtitle("Violin Plots of World Values Survey Trust Scores by Condition and Order of Task in Survey")
+```
+\
+Despite some outlying respones, the overall pattern by condition looks similar regardless of presentation order.
+\
+```{r, echo=FALSE, dpi=300, fig.height = 6, message = FALSE, warning = FALSE}
+ggplot(final, aes(x = Cond, y = game)) + 
+  geom_violin(position = dodge) +
+  scale_x_discrete("Condition") +
+  scale_y_continuous("Number of Tickets Given", limits = c(0, 1000)) +
+  facet_wrap(~ trust.order) +
+  ggtitle("Violin Plots of Number of Tickets Entrusted to Other in Trust Game by Condition and Order of Task in Survey")
+```
+\
+Again, the overall pattern by condition looks similar regardless of presentation order.
+\
+```{r, echo=FALSE, dpi=300, fig.height = 6, message = FALSE, warning = FALSE}
+ggplot(final, aes(x = Cond, y = iri)) + 
+  geom_violin(position = dodge) +
+  scale_x_discrete("Condition") +
+  scale_y_continuous("IRI Perspective Taking", limits = c(1, 5), breaks = c(1:5)) +
+  facet_wrap(~ perspective.order) +
+  ggtitle("Violin Plots of IRI Perspective-Taking Scores Trust Scores by Condition and Order of Task in Survey")
+```
+\
+Again, presentation order does not seem to influence the pattern of responses by condition.
+\
+```{r, echo=FALSE, dpi=300, fig.height = 6, message = FALSE, warning = FALSE}
+ggplot(final, aes(x = Cond, y = rme)) + 
+  geom_violin(position = dodge) +
+  scale_x_discrete("Condition") +
+  scale_y_continuous("Proportion Reading the Mind in the Eyes Correct",
+                     limits = c(0, 1)) +
+  facet_wrap(~ perspective.order) +
+  ggtitle("Violin Plots of Reading the Mind in the Eyes Scores by Condition and Order of Task in Survey")
+```
+\
+Once again, presentation order does not seem to influence the pattern of responses by condition.
+
+Overall, it seems that order effects are not an important consideration in this study. 
 
 ## Confirmatory analyses
 
-Now, let's look a
+Finally, we will use t-tests to test for differences between conditions on our five dependent measures. Because we are running five tests, a Bonferroni correction would allow us to reject the null at p < .01.
+
+```{r t-tests}
+# Action Goals
+with(final, t.test(action ~ Cond))
+
+# World Values Survey Trust
+with(final, t.test(wvs ~ Cond))
+
+# Trust Game
+with(final, t.test(game ~ Cond))
+
+# IRI Perspective-Taking
+with(final, t.test(iri ~ Cond))
+
+# Reading the Mind in the Eyes
+with(final, t.test(rme ~ Cond))
+```
+
+After Bonferroni correction, we find a signficant difference only for action.
